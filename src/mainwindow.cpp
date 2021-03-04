@@ -28,6 +28,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QTimer>
+#include <iostream>
 
 /**
  * @brief MainWindow::MainWindow handles all of the main functionality and also
@@ -287,7 +288,13 @@ void MainWindow::onUpdate(bool block) {
  */
 void MainWindow::onPush() {
   if (QtPassSettings::isUseGit()) {
-    ui->statusBar->showMessage(tr("Updating password-store"), 2000);
+    if(const char* env_p = std::getenv("SSH_AUTH_SOCK")) {
+      std::cout << "SSH_AUTH_SOCK: " << env_p << std::endl;
+      ui->statusBar->showMessage(tr(env_p), 2000);
+    } else {
+      std::cout << "NO_SSH_AUTH_SOCK" << std::endl;
+      ui->statusBar->showMessage(tr("No SSH_AUTH_SOCK"), 2000);
+    }
     QtPassSettings::getPass()->GitPush();
   }
 }
